@@ -1,16 +1,25 @@
-{
-  "name": "deeptalk",
-  "private": true,
+﻿{
+  "name": "deeptalk-frontend",
   "version": "0.1.0",
+  "private": true,
+  "description": "DeepTalk 前端 UI(卡片流 / 双态动效 / 影子回放 / 导入 / 导出面板)。零依赖,纯 ES Module,可用浏览器直接演示。",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/serve.mjs",
+    "serve": "node scripts/serve.mjs",
     "build": "vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "dev:vite": "vite",
+    "test": "node test/smoke.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@tauri-apps/api": "^2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
+    "jsdom": "^24",
     "vite": "^6"
   }
 }

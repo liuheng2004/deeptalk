@@ -1,0 +1,13 @@
+{
+  "name": "deeptalk-render",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DeepTalk 导出渲染器:分享卡片 PNG + PDF(纯前端字体渲染)",
+  "scripts": {
+    "render": "node render_exports.js"
+  },
+  "dependencies": {
+    "pdfkit": "^0.15.0",
+    "pureimage": "^0.4.2"
+  }
+}

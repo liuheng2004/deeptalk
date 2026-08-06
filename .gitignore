@@ -5,6 +5,12 @@
 node_modules/
 dist/
 *.log
+scripts/render/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
 
 # Rust / Tauri
 target/
@@ -22,3 +28,7 @@ Thumbs.db
 *.msi
 *.dmg
 release/
+
+# 演示输出
+out/
+demo-out/
