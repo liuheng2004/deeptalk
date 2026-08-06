@@ -16,8 +16,8 @@ DeepTalk 是一款「微信深度对话的记忆与回应工具」:从微信导�
 > 构建命令待 M1 初始化后补充完整,以下为基本流程。
 
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/<your-name>/deeptalk.git
+# 1. 克隆仓库(GitHub 远端尚未创建;创建并推送后,替换为实际地址)
+git clone <remote-url> deeptalk
 cd deeptalk
 
 # 2. 配置环境变量(填入 DeepSeek API Key)
