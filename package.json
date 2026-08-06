@@ -15,7 +15,9 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "@tauri-apps/api": "^2"
+    "@tauri-apps/api": "^2",
+    "pdfkit": "^0.19.1",
+    "pureimage": "^0.4.20"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
