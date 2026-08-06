@@ -1,0 +1,185 @@
+/* =====================================================================
+   Gallery Waitlist 皮肤 —— 仅作用于首页"深度对话卡片流"
+   参考 variant.com/community 的真实设计规格:
+   - 近黑舞台背景 #070706, 卡片 8px 圆角, 无彩色渐变
+   - 卡片 64px 头部条, 悬浮时顶部渐变遮罩 + 右上角操作提示
+   - 入场 shimmer 扫光 + 上浮, 尊重 html.reduced 减弱动效
+   ===================================================================== */
+
+.card-grid {
+  --g-bg: #070706;
+  --g-card: #0f0f0e;
+  --g-card-hover: #141412;
+  --g-line: rgba(240, 237, 229, 0.10);
+  --g-line-strong: rgba(240, 237, 229, 0.20);
+  --g-ink: #f0ede9;
+  --g-muted: rgba(240, 237, 229, 0.54);
+  --g-radius: 8px;
+  --g-ease: cubic-bezier(.2, .8, .2, 1);
+
+  background: var(--g-bg);
+  border: 1px solid var(--g-line);
+  border-radius: 16px;
+  padding: 16px;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* ---- 卡片本体: 8px 圆角、无边框彩色、无顶部渐变条 ---- */
+.card-grid .talk-card {
+  background: var(--g-card);
+  border: 1px solid var(--g-line);
+  border-radius: var(--g-radius);
+  padding: 0;
+  box-shadow: none;
+  animation: galleryCardIn .6s var(--g-ease) backwards;
+}
+.card-grid .talk-card:nth-child(2) { animation-delay: .06s; }
+.card-grid .talk-card:nth-child(3) { animation-delay: .12s; }
+.card-grid .talk-card:nth-child(4) { animation-delay: .18s; }
+.card-grid .talk-card:nth-child(5) { animation-delay: .24s; }
+.card-grid .talk-card:nth-child(6) { animation-delay: .30s; }
+
+/* 入场 shimmer 扫光(仿 Variant widgetCardShimmer),结束后归零 */
+.card-grid .talk-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  background: linear-gradient(105deg,
+    transparent 42%,
+    rgba(240, 237, 229, 0.08) 50%,
+    transparent 58%);
+  background-size: 220% 100%;
+  animation: galleryShimmer 1.05s ease-out .12s backwards;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ---- 64px 头部条 ---- */
+.card-grid .talk-card .row {
+  height: 64px;
+  padding: 0 14px;
+  gap: 12px;
+  border-bottom: 1px solid var(--g-line);
+}
+.card-grid .talk-card h3 {
+  font-size: 15px;
+  color: var(--g-ink);
+  font-weight: 650;
+  letter-spacing: .01em;
+}
+.card-grid .talk-card .peer {
+  font-size: 12px;
+  color: var(--g-muted);
+}
+
+/* 深度分数: 压缩为 40px 中性圆环,去掉"深度"小字 */
+.card-grid .talk-card .score {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: conic-gradient(
+    rgba(240, 237, 229, 0.92) calc(var(--val) * 1%),
+    rgba(240, 237, 229, 0.12) 0);
+}
+.card-grid .talk-card .score::after {
+  inset: 3px;
+  background: var(--g-card);
+}
+.card-grid .talk-card .score b {
+  font-size: 13px;
+  color: var(--g-ink);
+}
+.card-grid .talk-card .score small { display: none; }
+
+/* 情绪标签: 中性描边,去掉彩色发光点 */
+.card-grid .talk-card .mood-chip {
+  border-color: var(--g-line-strong);
+  color: var(--g-muted);
+  background: rgba(240, 237, 229, 0.04);
+}
+.card-grid .talk-card .mood-chip::before {
+  background: var(--g-muted);
+  box-shadow: none;
+}
+
+/* ---- 正文: 摘要 + 金句(编辑风拉引) ---- */
+.card-grid .talk-card .summary {
+  margin: 0;
+  padding: 16px 16px 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--g-ink);
+}
+.card-grid .talk-card .quotes {
+  margin: 12px 16px 0;
+  padding-left: 12px;
+  border-left: 1px solid var(--g-line-strong);
+  color: var(--g-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ---- 底部元信息: 标签胶囊 ---- */
+.card-grid .talk-card .meta {
+  margin-top: 0;
+  padding: 12px 16px 14px;
+}
+.card-grid .talk-card .tag {
+  background: rgba(240, 237, 229, 0.05);
+  border-color: var(--g-line);
+  color: var(--g-muted);
+  font-size: 11.5px;
+}
+
+/* ---- 悬浮/聚焦: 上下渐变压暗 + 右上角操作提示(仿 CardIcons) ---- */
+.card-grid .talk-card::after {
+  content: "查看片段 \2197";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 12px 14px 0 0;
+  font-size: 12.5px;
+  letter-spacing: .03em;
+  color: rgba(240, 237, 229, 0.94);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 128px),
+    linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent 72px);
+  opacity: 0;
+  transition: opacity .25s ease;
+  pointer-events: none;
+}
+.card-grid .talk-card:hover,
+.card-grid .talk-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--g-line-strong);
+  background: var(--g-card-hover);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+}
+.card-grid .talk-card:hover::after,
+.card-grid .talk-card:focus-visible::after {
+  opacity: 1;
+}
+
+/* ---- 动效 ---- */
+@keyframes galleryCardIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes galleryShimmer {
+  0%   { opacity: 0; background-position: 130% 0; }
+  18%  { opacity: 1; }
+  100% { opacity: 0; background-position: -120% 0; }
+}
+
+/* ---- 减弱动效: 全部关掉 ---- */
+html.reduced .card-grid .talk-card,
+html.reduced .card-grid .talk-card::before {
+  animation: none !important;
+}

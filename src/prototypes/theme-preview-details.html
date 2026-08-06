@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-mood="calm">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeepTalk · 微细节演示(detail.design)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Urbanist:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles/app.css" />
+  <link rel="stylesheet" href="../styles/theme-motion.css" />
+  <link rel="stylesheet" href="../styles/theme-details.css" />
+</head>
+<body>
+  <a class="skip-link" href="#view">跳到主内容</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">DeepTalk</span>
+    </div>
+
+    <nav class="mainnav" aria-label="主导航">
+      <a href="#/import" data-route="/import">导入</a>
+      <a href="#/" data-route="/">卡片流</a>
+    </nav>
+
+    <div class="topbar-actions">
+      <button id="reduceToggle" class="ghost-btn" type="button" aria-pressed="false" title="减弱动效">
+        <span class="dot" aria-hidden="true"></span> 减弱动效
+      </button>
+    </div>
+  </header>
+
+  <main id="view" class="view" tabindex="-1"><!-- 视图由路由渲染 --></main>
+
+  <footer class="foot">
+    <span>DeepTalk · 纯本地运行,数据不出设备</span>
+    <span class="foot-hint">微细节演示 · 叠加在 Motion 皮肤之上,不动共享 JS</span>
+  </footer>
+
+  <script>
+    /* 微细节演示(仅本预览页生效,不改共享 JS):
+       1) 容错输入:导入文本框实时字符计数、不限长度;
+       2) 死胡同反馈:空内容点解析 → 抖动 + 行内提示,替代系统 alert;
+       3) 聚焦态由 theme-details.css 的 :focus-visible 规则负责。 */
+    (function () {
+      var view = document.getElementById("view");
+      var clearTimer = 0;
+
+      function ensureError() {
+        var el = view.querySelector(".field-error");
+        if (el) return el;
+        el = document.createElement("p");
+        el.className = "field-error";
+        el.setAttribute("role", "alert");
+        var txt = view.querySelector("#txt");
+        (txt && txt.parentNode ? txt.parentNode : view).appendChild(el);
+        return el;
+      }
+
+      function ensureHint() {
+        var el = view.querySelector(".paste-hint");
+        if (el) return el;
+        el = document.createElement("div");
+        el.className = "paste-hint";
+        var txt = view.querySelector("#txt");
+        (txt && txt.parentNode ? txt.parentNode : view).appendChild(el);
+        return el;
+      }
+
+      function refreshCount() {
+        var txt = view.querySelector("#txt");
+        var hint = view.querySelector(".paste-hint");
+        if (!txt || !hint) return;
+        hint.textContent = txt.value.length + " 字符 · 不限长度,可以一直写";
+      }
+
+      function showEmptyFeedback() {
+        var drop = view.querySelector(".dropzone");
+        if (drop) {
+          drop.classList.remove("shake");
+          void drop.offsetWidth;
+          drop.classList.add("shake");
+        }
+        var err = ensureError();
+        err.textContent = "还没有内容 —— 先粘贴或拖入一段聊天文本,再点解析。";
+        clearTimeout(clearTimer);
+        clearTimer = setTimeout(function () {
+          err.textContent = "";
+          if (drop) drop.classList.remove("shake");
+        }, 2600);
+      }
+
+      // 用行内提示替代系统弹窗(导入页的空输入提示)
+      var nativeAlert = window.alert;
+      window.alert = function (msg) {
+        if (view.querySelector(".dropzone") || String(msg).indexOf("请先粘贴") !== -1) {
+          showEmptyFeedback();
+        } else {
+          nativeAlert(msg);
+        }
+      };
+
+      document.addEventListener("input", function (e) {
+        if (e.target && e.target.id === "txt") refreshCount();
+      });
+
+      // 视图每次渲染后(含路由切换)重新注入计数
+      new MutationObserver(function () {
+        if (view.querySelector("#txt")) {
+          ensureHint();
+          refreshCount();
+        }
+      }).observe(view, { childList: true, subtree: true });
+
+      if (view.querySelector("#txt")) { ensureHint(); refreshCount(); }
+
+      // 演示钩子:?shake=1 时自动展示一次"空输入"反馈(仅用于截图演示)
+      if (location.search.indexOf("shake=1") !== -1 && view.querySelector("#txt")) {
+        showEmptyFeedback();
+      }
+    })();
+  </script>
+
+  <script type="module" src="../js/main.js"></script>
+</body>
+</html>

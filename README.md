@@ -64,4 +64,4 @@ deeptalk/
 
 ## 开源协议
 
-[MIT](LICENSE)
+[GPL-3.0](LICENSE)

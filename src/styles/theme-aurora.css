@@ -1,0 +1,220 @@
+/* =====================================================================
+   DeepTalk · Aurora 皮肤(视觉升级原型)
+   - 叠加在 app.css 之后,只改"质感",不动布局与逻辑。
+   - 借鉴方向:Mineradio 的深色沉浸 + 玻璃拟态 + 柔和光晕(仅取其质感,无粒子/3D)。
+   - 双态保持:joy 暖玫瑰金 / calm 冷静青;html.reduced 由 app.css 统一接管。
+   - 纯 CSS,零常驻开销,低功耗。
+   ===================================================================== */
+
+:root {
+  /* 更深、更暖的"深夜底色" */
+  --bg-0: #07050d;
+  --bg-1: #0e0a18;
+  --bg-2: #171024;
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-2: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --ink: #f2ecff;
+  --muted: #9b93b8;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+
+  /* 玻璃质感 */
+  --glass-bg: linear-gradient(160deg, rgba(255,255,255,0.075), rgba(255,255,255,0.02) 55%);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.10);
+  --glass-hi: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+
+  /* 默认(平静)强调色:冷静青 */
+  --accent: #8fd8df;
+  --accent-2: #7b9bff;
+  --accent-ink: #06141a;
+  --glow: rgba(122, 205, 214, 0.28);
+}
+
+/* 愉悦态:玫瑰金 */
+[data-mood="joy"] {
+  --accent: #ffd1a1;
+  --accent-2: #ff8a5c;
+  --accent-ink: #2a1202;
+  --glow: rgba(255, 140, 90, 0.32);
+}
+/* 平静态:冷静青 */
+[data-mood="calm"] {
+  --accent: #8fd8df;
+  --accent-2: #7b9bff;
+  --accent-ink: #06141a;
+  --glow: rgba(122, 205, 214, 0.28);
+}
+
+/* ---------------- 页面氛围:烛光 + 月光两层柔光 ---------------- */
+body {
+  background:
+    radial-gradient(58% 42% at 50% -6%, rgba(255, 148, 92, 0.10), transparent 70%),
+    radial-gradient(70% 55% at 88% 112%, rgba(120, 130, 255, 0.08), transparent 72%),
+    radial-gradient(120% 120% at 50% -10%, var(--bg-2) 0%, var(--bg-0) 62%);
+  background-attachment: fixed;
+}
+
+/* ---------------- 顶栏:强玻璃 ---------------- */
+.topbar {
+  background: rgba(10, 7, 18, 0.52);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.32);
+}
+.brand-mark {
+  width: 24px; height: 24px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 18px var(--glow), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.brand-name {
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  background: linear-gradient(120deg, #fff 20%, var(--accent) 70%, var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--ink);
+}
+.mainnav a.active {
+  color: var(--ink);
+  background: linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+/* ---------------- 通用玻璃面板 ---------------- */
+.panel, .card {
+  background: var(--glass-bg);
+  border: var(--glass-border);
+  box-shadow: var(--glass-hi), 0 18px 48px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+}
+
+/* ---------------- 标题字距 ---------------- */
+.page-head h1 {
+  font-size: 26px;
+  font-weight: 620;
+  letter-spacing: 0.02em;
+}
+.page-head p { color: var(--muted); letter-spacing: 0.01em; }
+
+/* ---------------- 卡片流:柔和外发光 ---------------- */
+.talk-card {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,0.05), transparent 60%),
+    var(--glass-bg);
+  border: var(--glass-border);
+  box-shadow: var(--glass-hi), 0 16px 44px rgba(0, 0, 0, 0.32);
+  border-radius: var(--radius);
+}
+.talk-card::before {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
+  opacity: 0.9;
+}
+.talk-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: var(--glass-hi), 0 22px 60px rgba(0, 0, 0, 0.5), 0 0 46px var(--glow);
+}
+.talk-card .summary { color: #e3dcf2; }
+.talk-card .quotes {
+  border-left: 2px solid var(--accent);
+  color: #c7bede;
+}
+
+/* 深度评分环:外圈柔光 */
+.score {
+  box-shadow: 0 0 22px var(--glow);
+}
+.score::after { background: var(--bg-1); }
+
+/* ---------------- 按钮 ---------------- */
+.btn {
+  border-radius: 13px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3), 0 0 18px var(--glow);
+}
+.btn:hover {
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.38), 0 0 30px var(--glow);
+}
+.btn.secondary {
+  background: linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+  box-shadow: var(--glass-hi);
+}
+
+/* ---------------- 导入页 ---------------- */
+.dropzone {
+  background: var(--glass-bg);
+  border: 1.5px dashed rgba(255, 255, 255, 0.16);
+  box-shadow: var(--glass-hi);
+}
+.dropzone.drag {
+  border-color: var(--accent);
+  background: linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+  box-shadow: 0 0 34px var(--glow);
+}
+textarea.paste {
+  background: rgba(8, 5, 14, 0.55);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+.field-list li {
+  background: linear-gradient(160deg, rgba(255,255,255,0.055), rgba(255,255,255,0.02));
+  box-shadow: var(--glass-hi);
+}
+
+/* ---------------- 详情页气泡:更透的玻璃 ---------------- */
+.msg.me {
+  background: linear-gradient(160deg, rgba(110, 168, 255, 0.20), rgba(110, 168, 255, 0.08));
+  border: 1px solid rgba(110, 168, 255, 0.32);
+  box-shadow: var(--glass-hi);
+  backdrop-filter: blur(8px);
+}
+.msg.peer {
+  background: linear-gradient(160deg, rgba(255, 157, 122, 0.20), rgba(255, 157, 122, 0.08));
+  border: 1px solid rgba(255, 157, 122, 0.32);
+  box-shadow: var(--glass-hi);
+  backdrop-filter: blur(8px);
+}
+
+/* ---------------- 回应页 ---------------- */
+.response-card { letter-spacing: 0.01em; }
+.golden {
+  border-left: 3px solid var(--accent);
+  color: #efe7ff;
+  text-shadow: 0 0 22px var(--glow);
+}
+
+/* ---------------- 导出面板 ---------------- */
+.fmt {
+  background: var(--glass-bg);
+  box-shadow: var(--glass-hi);
+}
+.fmt.selected {
+  border-color: var(--accent);
+  background: linear-gradient(160deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03));
+  box-shadow: var(--glass-hi), 0 0 26px var(--glow);
+}
+.export-preview {
+  background:
+    radial-gradient(80% 60% at 50% 30%, rgba(255, 150, 100, 0.10), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.035), rgba(0,0,0,0.25));
+  border: 1px solid var(--border);
+}
+
+/* ---------------- 空态 ---------------- */
+.empty {
+  background: var(--glass-bg);
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  box-shadow: var(--glass-hi);
+}
+
+/* ---------------- 页脚 ---------------- */
+.foot {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+}
