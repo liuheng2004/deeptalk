@@ -110,14 +110,47 @@
     },
     "messages": {
       "type": "array",
-      "description": "该片段包含的消息(与 session 中 message 结构一致,此处内嵌)",
+      "description": "该片段包含的消息,结构与 session.schema.json 中 message 定义一致",
       "items": {
-        "type": "object"
+        "type": "object",
+        "required": ["id", "sender", "content", "timestamp"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "消息唯一 ID(会话内递增或哈希)"
+          },
+          "sender": {
+            "type": "string",
+            "description": "发送者昵称;本机统一记为 me"
+          },
+          "content": {
+            "type": "string",
+            "description": "消息文本内容"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["text", "voip_text", "quote", "system"],
+            "description": "消息类型:text 文本 / voip_text 语音转文字 / quote 引用 / system 系统消息"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "消息时间;缺失时由解析器推断"
+          },
+          "inferred_time": {
+            "type": "boolean",
+            "description": "时间戳是否为推断值(默认 false)"
+          },
+          "quote_of": {
+            "type": "string",
+            "description": "被引用的消息 id(可选)"
+          }
+        }
       }
     },
     "model": {
       "type": "string",
-      "description": "生成所用模型,如 deep-v4-flash"
+      "description": "生成所用模型,如 deepseek-v4-flash"
     }
   }
 }
