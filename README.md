@@ -11,21 +11,32 @@ DeepTalk 是一款「微信深度对话的记忆与回应工具」:从微信导�
 - **导出**:图片(PNG)/ PDF / Markdown 三种格式,品牌水印可关闭;
 - **隐私**:纯本地运行,数据不出设备,本地加密存储。
 
-## 快速开始
+## 安装(Windows 内测包)
 
-> 构建命令待 M1 初始化后补充完整,以下为基本流程。
+v0.1 内测包通过 GitHub Releases 发布:访问 [liuheng2004/deeptalk Releases](https://github.com/liuheng2004/deeptalk/releases),下载 `DeepTalk_0.1.0_x64-setup.exe`,双击按提示安装即可。
+
+- **系统要求**:Windows 10/11(x64),需 WebView2 运行时(Windows 10/11 一般已内置;缺失时安装程序会引导下载)。
+- **SmartScreen 说明**:安装包目前未做代码签名,首次运行时 Windows SmartScreen 可能提示「Windows 已保护你的电脑」。这是正常现象,点击 **更多信息 → 仍要运行** 即可继续;也可以在文件资源管理器中右键安装包 → 属性 → 勾选 **解除锁定** → 确定后再次双击。企业环境如需批量安装,请联系管理员放行或加入例外策略。
+- **数据位置**:应用数据(含本地加密的主密钥)保存在当前用户的 `%APPDATA%\deeptalk`;卸载应用不会自动删除该目录,请自行备份。
+
+## 从源码构建
 
 ```bash
-# 1. 克隆仓库(GitHub 远端尚未创建;创建并推送后,替换为实际地址)
-git clone <remote-url> deeptalk
+# 1. 克隆仓库
+git clone https://github.com/liuheng2004/deeptalk.git
 cd deeptalk
 
 # 2. 配置环境变量(填入 DeepSeek API Key)
 cp .env.example .env
 
-# 3. 安装前端依赖并启动 Tauri 开发模式
+# 3. 安装前端依赖
 npm install
+
+# 4. 开发模式运行
 npm run tauri dev
+
+# 5. 打包 Windows 安装包(NSIS exe)
+npm run tauri build
 ```
 
 环境要求:Node.js LTS、Rust(rustup)、Tauri 2 依赖(Windows 需 WebView2)。

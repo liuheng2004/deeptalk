@@ -37,7 +37,7 @@ impl Cipher {
                     fs::create_dir_all(parent).map_err(|e| e.to_string())?;
                 }
                 fs::write(&path, hex_encode(&key)).map_err(|e| e.to_string())?;
-                key
+                key.to_vec()
             }
         };
         Ok(Self {
