@@ -45,3 +45,28 @@ python3 -m http.server 8080
 - [x] 切换 A / B 两组不同时间戳样例，气泡节奏随之变化。
 - [x] 3–5 秒循环（滑块可调）。
 - [x] 提供「减弱动效」开关。
+
+---
+
+# WebGL 进入动画原型 (splash-gl.html)
+
+单文件 HTML 原型：全屏 WebGL 单 shader 氛围（暖色渐变 + logo 光晕），无粒子、低功耗，总时长 3.2s。
+
+## 运行方式
+
+浏览器直接打开 `src/prototypes/splash-gl.html` 即可（零依赖）。
+
+## 设计约束（均已实现）
+
+- 时长 2~4s（默认 3.2s），到点自动退出；
+- 退出后销毁 rAF / 定时器 / resize 监听 / GL 上下文，动画期外零开销；
+- 像素比封顶 1.5，关闭 antialias / depth / stencil / preserveDrawingBuffer；
+- 尊重系统 `prefers-reduced-motion`：只画一帧静态画面、不跑动画循环、时长缩至 1.2s；
+- 点击 / 回车 / 空格可跳过；
+- 左下角「减弱动效」开关，localStorage 持久化（`deeptalk:reducedMotion`）；
+- WebGL 不可用时自动降级为纯 CSS 渐变（不黑屏）；
+- 退出后提供「重新播放进入动画」按钮便于反复预览。
+
+## 文件
+
+- `splash-gl.html` — 原型本体（内联 CSS/JS，自包含）。
