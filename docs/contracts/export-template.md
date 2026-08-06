@@ -1,6 +1,6 @@
 # 导出模板规范
 
-> 定稿状态:初稿,待 CodeBuddy 评审。
+> 定稿状态:已定稿。
 
 ## 通用规则
 
@@ -33,7 +33,7 @@
 title: 深夜长谈:关于未来的选择
 date: 2024-05-20
 peer: 某某
-score: 87
+depth_score: 87
 tags: [深夜emo, 职业选择]
 session_id: xxx
 ---
