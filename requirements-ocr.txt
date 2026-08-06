@@ -1,0 +1,4 @@
+# AI 聊天截图 OCR 导入(core/parser/ocr.py)依赖
+# 安装:.venv/Scripts/pip install -r requirements-ocr.txt
+rapidocr_onnxruntime
+pillow
