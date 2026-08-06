@@ -13,17 +13,20 @@ DeepTalk 是一款「微信深度对话的记忆与回应工具」:从微信导�
 
 ## 快速开始
 
-> 构建命令待 M1 初始化后补充完整,以下为基本流程。
+前端 UI 零依赖,可直接演示:
 
 ```bash
-# 1. 克隆仓库(GitHub 远端尚未创建;创建并推送后,替换为实际地址)
+# 1. 克隆仓库
 git clone <remote-url> deeptalk
 cd deeptalk
 
 # 2. 配置环境变量(填入 DeepSeek API Key)
 cp .env.example .env
 
-# 3. 安装前端依赖并启动 Tauri 开发模式
+# 3. 启动前端演示(零依赖静态服务)
+npm run dev          # http://localhost:5173/
+
+# 4. (可选)Tauri 桌面端,需先安装依赖
 npm install
 npm run tauri dev
 ```
