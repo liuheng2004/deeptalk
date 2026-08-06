@@ -5,16 +5,16 @@
 node_modules/
 dist/
 *.log
+scripts/render/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
 
 # Rust / Tauri
 target/
 src-tauri/target/
-
-# Python(识别引擎 core/analysis)
-__pycache__/
-*.pyc
-.pytest_cache/
-.venv/
 
 # IDE / 系统
 .idea/
@@ -27,3 +27,7 @@ Thumbs.db
 *.msi
 *.dmg
 release/
+
+# 演示输出
+out/
+demo-out/
