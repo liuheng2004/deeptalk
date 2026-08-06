@@ -10,6 +10,12 @@ dist/
 target/
 src-tauri/target/
 
+# Python(识别引擎 core/analysis)
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
 # IDE / 系统
 .idea/
 .vscode/
