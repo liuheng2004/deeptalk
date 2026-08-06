@@ -66,7 +66,9 @@ export async function renderPng(input: ExportInput, opts: ExportOptions): Promis
   ensureFont(fontPath);
 
   const canvas = pureimage.make(W, H);
-  const ctx = canvas.getContext('2d');
+  // pureimage 的类型定义对 fillStyle / addColorStop / roundRect 等约束过严,
+  // 实际运行时接受字符串颜色与渐变对象,这里按 any 处理。
+  const ctx = canvas.getContext('2d') as any;
 
   const score = input.analysis.depth_score;
   const warm = score >= 70;

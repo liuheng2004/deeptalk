@@ -1,6 +1,6 @@
 import { statSync } from 'node:fs';
 import { exportToFile } from './index.js';
-import type { ChatMessage, ExportInput } from './types.js';
+import type { ChatMessage, ExportInput, ExportOptions } from './types.js';
 
 /** 生成本机时区的 ISO(不带 Z),保证渲染出来的时钟与样例数据一致。 */
 function localISO(d: Date): string {
@@ -76,7 +76,7 @@ const input: ExportInput = {
 
 async function main(): Promise<void> {
   const outDir = 'samples';
-  const jobs: Array<[string, Parameters<typeof exportToFile>[1], string]> = [
+  const jobs: Array<[ExportOptions, string, string]> = [
     // 三份验收样例(默认:水印开、敏感字段隐藏)
     [{ format: 'png' }, `${outDir}/deeptalk-sample.png`, 'PNG'],
     [{ format: 'pdf' }, `${outDir}/deeptalk-sample.pdf`, 'PDF'],
