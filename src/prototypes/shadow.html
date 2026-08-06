@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DeepTalk · 完整剪影版影子回放 (原型)</title>
+<style>
+  :root {
+    --bg-0: #0b1020;
+    --bg-1: #1a2342;
+    --me:   #6ea8ff;
+    --peer: #ff9d7a;
+    --ink:  #e8edff;
+    --muted:#8b93b8;
+    --bubble-me: rgba(110,168,255,0.18);
+    --bubble-peer: rgba(255,157,122,0.18);
+    --loop: 4000ms; /* 由 JS 覆盖为实际循环时长 */
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color: var(--ink);
+    background: radial-gradient(120% 120% at 50% 0%, var(--bg-1) 0%, var(--bg-0) 60%);
+    overflow: hidden;
+  }
+
+  /* ---------- 舞台 ---------- */
+  .stage {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background:
+      radial-gradient(60% 40% at 50% 88%, rgba(255,255,255,0.05), transparent 70%),
+      linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.35) 100%);
+  }
+
+  /* 地面 / 倒影 */
+  .floor {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 26%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.45));
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ---------- 剪影人物 ---------- */
+  .figure {
+    position: relative;
+    width: 200px;
+    height: 62%;
+    margin: 0 4vw;
+    bottom: 8%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: breathe 5.5s ease-in-out infinite;
+  }
+  .figure.peer { animation-delay: -2.7s; }
+
+  .figure svg { width: 100%; height: 100%; display: block; }
+
+  /* 沉默 / 说话时的轻微起伏 */
+  .figure.speaking { animation-duration: 2.4s; }
+
+  @keyframes breathe {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    50%      { transform: translateY(-4px) scaleY(1.012); }
+  }
+
+  /* ---------- 气泡 ---------- */
+  .bubble-layer {
+    position: absolute;
+    bottom: 64%;
+    width: 320px;
+    height: 0;
+    pointer-events: none;
+  }
+  .bubble-layer.me   { left: 50%; margin-left: -360px; text-align: right; }
+  .bubble-layer.peer { right: 50%; margin-right: -360px; text-align: left; }
+
+  .bubble {
+    position: absolute;
+    bottom: 0;
+    max-width: 280px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.45;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.12);
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+    transition: opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .bubble.me {
+    background: var(--bubble-me);
+    border-color: rgba(110,168,255,0.4);
+    color: #dbe8ff;
+    border-bottom-right-radius: 4px;
+  }
+  .bubble.peer {
+    background: var(--bubble-peer);
+    border-color: rgba(255,157,122,0.4);
+    color: #ffe6da;
+    border-bottom-left-radius: 4px;
+  }
+  .bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+  .bubble.gone { opacity: 0; transform: translateY(-10px) scale(0.98); }
+
+  /* ---------- 减弱动效 ---------- */
+  .stage.reduced .figure { animation: none !important; }
+  .stage.reduced .bubble {
+    transition: opacity .12s linear !important;
+    transform: none !important;
+  }
+  .stage.reduced .bubble.show { transform: none !important; }
+  .stage.reduced .bubble.gone { transform: none !important; }
+
+  /* ---------- 控制条 ---------- */
+  .controls {
+    position: fixed;
+    top: 16px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(12,18,38,0.72);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    font-size: 13px;
+    z-index: 10;
+  }
+  .controls label { color: var(--muted); }
+  .controls select, .controls input[type=range] { accent-color: var(--me); }
+  .controls select {
+    background: #121a33; color: var(--ink);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 8px; padding: 5px 8px;
+  }
+  .controls button {
+    background: #1d2a4d; color: var(--ink);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 8px; padding: 6px 12px; cursor: pointer;
+  }
+  .controls button[aria-pressed="true"] { background: var(--me); color: #07112b; border-color: var(--me); }
+  .controls .val { color: var(--ink); min-width: 42px; text-align: right; }
+
+  /* ---------- 水印 (参考导出模板规范) ---------- */
+  .watermark {
+    position: fixed;
+    right: 14px; bottom: 10px;
+    font-size: 12px;
+    color: rgba(232,237,255,0.35);
+    letter-spacing: 1px;
+    user-select: none;
+    z-index: 5;
+  }
+
+  /* 进度条 */
+  .progress {
+    position: fixed;
+    left: 0; bottom: 0; height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--me), var(--peer));
+    z-index: 6;
+  }
+</style>
+</head>
+<body>
+  <div class="controls">
+    <label for="dataset">样例</label>
+    <select id="dataset">
+      <option value="A">A · 深夜长谈(间隔疏密不均)</option>
+      <option value="B">B · 清晨快聊(节奏紧凑)</option>
+    </select>
+
+    <label for="loop">循环</label>
+    <input id="loop" type="range" min="3000" max="5000" step="250" value="4000" />
+    <span class="val" id="loopVal">4.0s</span>
+
+    <button id="reduce" aria-pressed="false">减弱动效</button>
+    <button id="replay">重播</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="floor"></div>
+
+    <!-- 我方剪影 -->
+    <div class="figure me" id="figMe">
+      <svg viewBox="0 0 200 320" aria-hidden="true">
+        <defs>
+          <linearGradient id="gMe" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#9cc0ff"/>
+            <stop offset="1" stop-color="#3f6bd6"/>
+          </linearGradient>
+        </defs>
+        <g fill="url(#gMe)">
+          <circle cx="100" cy="58" r="40"/>
+          <path d="M40 320 C40 210 62 130 100 130 C138 130 160 210 160 320 Z"/>
+          <path d="M100 150 C84 150 76 168 78 188 L74 250 L96 250 L96 170 Z"/>
+          <path d="M100 150 C116 150 124 168 122 188 L126 250 L104 250 L104 170 Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- 对方剪影 -->
+    <div class="figure peer" id="figPeer">
+      <svg viewBox="0 0 200 320" aria-hidden="true">
+        <defs>
+          <linearGradient id="gPeer" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffc0a3"/>
+            <stop offset="1" stop-color="#e8703f"/>
+          </linearGradient>
+        </defs>
+        <g fill="url(#gPeer)">
+          <circle cx="100" cy="58" r="40"/>
+          <path d="M40 320 C40 210 62 130 100 130 C138 130 160 210 160 320 Z"/>
+          <path d="M100 150 C84 150 76 168 78 188 L74 250 L96 250 L96 170 Z"/>
+          <path d="M100 150 C116 150 124 168 122 188 L126 250 L104 250 L104 170 Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="bubble-layer me"   id="layerMe"></div>
+    <div class="bubble-layer peer" id="layerPeer"></div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+  <div class="watermark">DeepTalk</div>
+
+<script>
+/* =========================================================================
+ * 数据：气泡节奏完全由「消息时间戳间隔」驱动，不写死任何动画时序。
+ * 切换样例 A / B 时，气泡浮现的疏密节奏会随之改变。
+ * ========================================================================= */
+const DATASETS = {
+  A: {
+    label: "深夜长谈",
+    // 间隔疏密不均：35s / 20s / 55s / 10s / 80s
+    messages: [
+      { from: "me",   t: "22:01:10", text: "你最近睡得还好吗？" },
+      { from: "peer", t: "22:01:45", text: "不太好，总在想以后的事。" },
+      { from: "me",   t: "22:02:05", text: "说给我听听。" },
+      { from: "peer", t: "22:03:00", text: "怕选错路，又怕原地踏步。" },
+      { from: "me",   t: "22:03:10", text: "其实你已经在走了。" },
+      { from: "peer", t: "22:04:30", text: "被你这句话接住了。" }
+    ]
+  },
+  B: {
+    label: "清晨快聊",
+    // 节奏紧凑：8s / 6s / 26s / 10s / 15s
+    messages: [
+      { from: "me",   t: "09:12:00", text: "早，路上顺利吗？" },
+      { from: "peer", t: "09:12:08", text: "顺利，刚到公司。" },
+      { from: "me",   t: "09:12:14", text: "今天会议多不多？" },
+      { from: "peer", t: "09:12:40", text: "下午一场，上午还能喘口气。" },
+      { from: "me",   t: "09:12:50", text: "那先喝杯咖啡。" },
+      { from: "peer", t: "09:13:05", text: "好提议，去续杯了。" }
+    ]
+  }
+};
+
+/* 把 "HH:MM:SS" 解析成自首条消息起的秒数偏移 */
+function toOffsets(messages) {
+  const base = messages[0].t;
+  const [bh, bm, bs] = base.split(":").map(Number);
+  const baseSec = bh * 3600 + bm * 60 + bs;
+  return messages.map(m => {
+    const [h, mi, s] = m.t.split(":").map(Number);
+    return (h * 3600 + mi * 60 + s) - baseSec;
+  });
+}
+
+const stage     = document.getElementById("stage");
+const layerMe   = document.getElementById("layerMe");
+const layerPeer = document.getElementById("layerPeer");
+const figMe     = document.getElementById("figMe");
+const figPeer   = document.getElementById("figPeer");
+const progress  = document.getElementById("progress");
+const loopInput = document.getElementById("loop");
+const loopVal   = document.getElementById("loopVal");
+
+let loopDuration = parseInt(loopInput.value, 10); // ms
+let timers = [];
+let rafId = null;
+let cycleStart = 0;
+
+function clearTimers() {
+  timers.forEach(clearTimeout);
+  timers = [];
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+  layerMe.innerHTML = "";
+  layerPeer.innerHTML = "";
+  figMe.classList.remove("speaking");
+  figPeer.classList.remove("speaking");
+}
+
+/* 根据当前数据集 + 循环时长，算出「缩放后」的时间轴 */
+function buildSchedule() {
+  const ds = DATASETS[document.getElementById("dataset").value];
+  const offsets = toOffsets(ds.messages);              // 真实秒偏移
+  const totalReal = offsets[offsets.length - 1];        // 首末消息真实间隔
+  // 缩放系数：让真实时长映射到 3–5s 的循环窗口内（间隔比例保持不变）
+  const scale = (loopDuration / 1000) / Math.max(totalReal, 0.001);
+
+  const schedule = [];
+  let cum = 0;
+  ds.messages.forEach((m, i) => {
+    const gap = i === 0 ? 0 : (offsets[i] - offsets[i - 1]) * scale; // 秒
+    cum += gap;
+    const appearAt = cum;                              // 秒
+    const live = Math.max(0.6, gap * 0.7);             // 气泡存活占比
+    schedule.push({ ...m, appearAt, live });
+  });
+  return schedule;
+}
+
+function spawnBubble(item) {
+  const layer = item.from === "me" ? layerMe : layerPeer;
+  const fig   = item.from === "me" ? figMe  : figPeer;
+  const el = document.createElement("div");
+  el.className = "bubble " + item.from;
+  el.textContent = item.text;
+
+  // 同侧多条并存时做轻微纵向错开，避免完全重叠
+  const siblings = layer.querySelectorAll(".bubble:not(.gone)").length;
+  el.style.bottom = (siblings * 14) + "px";
+
+  layer.appendChild(el);
+  fig.classList.add("speaking");
+
+  // 触发浮现
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("show")));
+
+  // 到期消散
+  const liveMs = item.live * 1000;
+  const tHide = setTimeout(() => {
+    el.classList.remove("show");
+    el.classList.add("gone");
+    fig.classList.remove("speaking");
+    const tRemove = setTimeout(() => el.remove(), 600);
+    timers.push(tRemove);
+  }, liveMs);
+  timers.push(tHide);
+}
+
+function play() {
+  clearTimers();
+  cycleStart = performance.now();
+  const schedule = buildSchedule();
+
+  schedule.forEach(item => {
+    const t = setTimeout(() => spawnBubble(item), item.appearAt * 1000);
+    timers.push(t);
+  });
+
+  // 进度条 + 循环
+  const tick = (now) => {
+    const p = Math.min(1, (now - cycleStart) / loopDuration);
+    progress.style.width = (p * 100) + "%";
+    if (p >= 1) { play(); return; }
+    rafId = requestAnimationFrame(tick);
+  };
+  rafId = requestAnimationFrame(tick);
+}
+
+/* ---------- 交互 ---------- */
+document.getElementById("dataset").addEventListener("change", play);
+loopInput.addEventListener("input", () => {
+  loopDuration = parseInt(loopInput.value, 10);
+  loopVal.textContent = (loopDuration / 1000).toFixed(1) + "s";
+  play();
+});
+document.getElementById("replay").addEventListener("click", play);
+
+const reduceBtn = document.getElementById("reduce");
+reduceBtn.addEventListener("click", () => {
+  const on = stage.classList.toggle("reduced");
+  reduceBtn.setAttribute("aria-pressed", String(on));
+});
+
+// 尊重系统「减少动态效果」偏好
+if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  stage.classList.add("reduced");
+  reduceBtn.setAttribute("aria-pressed", "true");
+}
+
+loopVal.textContent = (loopDuration / 1000).toFixed(1) + "s";
+play();
+</script>
+</body>
+</html>
