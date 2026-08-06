@@ -15,6 +15,7 @@ __pycache__/
 # Rust / Tauri
 target/
 src-tauri/target/
+src-tauri/gen/
 
 # IDE / 系统
 .idea/
