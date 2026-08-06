@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/deeptalk/deeptalk/blob/main/docs/contracts/session.schema.json",
+  "title": "ChatSession",
+  "description": "微信聊天会话的规范化数据模型(纯文本,不含图片)。由导入解析器(core/parser)输出。",
+  "type": "object",
+  "required": ["session_id", "peer", "messages", "created_at"],
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "会话唯一 ID(建议由双方昵称与时间生成哈希)"
+    },
+    "peer": {
+      "type": "string",
+      "description": "对方昵称 / 备注"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "description": "导入来源,如 wechat-email-txt"
+    },
+    "message_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/message"
+      }
+    },
+    "note": {
+      "type": "string",
+      "description": "解析说明,如时间戳推断情况"
+    }
+  },
+  "definitions": {
+    "message": {
+      "type": "object",
+      "required": ["id", "sender", "content", "timestamp"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "消息唯一 ID(会话内递增或哈希)"
+        },
+        "sender": {
+          "type": "string",
+          "description": "发送者昵称;本机统一记为 me"
+        },
+        "content": {
+          "type": "string",
+          "description": "消息文本内容"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text", "voip_text", "quote", "system"],
+          "description": "消息类型:text 文本 / voip_text 语音转文字 / quote 引用 / system 系统消息"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "消息时间;缺失时由解析器推断"
+        },
+        "inferred_time": {
+          "type": "boolean",
+          "description": "时间戳是否为推断值(默认 false)"
+        },
+        "quote_of": {
+          "type": "string",
+          "description": "被引用的消息 id(可选)"
+        }
+      }
+    }
+  }
+}

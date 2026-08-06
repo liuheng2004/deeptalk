@@ -1,0 +1,23 @@
+# 环境变量(禁止提交密钥)
+.env
+
+# Node
+node_modules/
+dist/
+*.log
+
+# Rust / Tauri
+target/
+src-tauri/target/
+
+# IDE / 系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 构建产物
+*.exe
+*.msi
+*.dmg
+release/
