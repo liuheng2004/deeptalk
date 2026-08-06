@@ -13,7 +13,7 @@
     "dev:vite": "vite",
     "test": "node test/smoke.mjs"
   },
-  "license": "MIT",
+  "license": "GPL-3.0",
   "dependencies": {
     "@tauri-apps/api": "^2"
   },
