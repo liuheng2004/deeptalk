@@ -21,3 +21,6 @@ Thumbs.db
 *.msi
 *.dmg
 release/
+
+# 探测/测试临时产物
+.probe/

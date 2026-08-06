@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-mood="calm">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeepTalk · 深度对话的记忆与回应</title>
+  <link rel="stylesheet" href="./styles/app.css" />
+</head>
+<body>
+  <a class="skip-link" href="#view">跳到主内容</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">DeepTalk</span>
+    </div>
+
+    <nav class="mainnav" aria-label="主导航">
+      <a href="#/import" data-route="/import">导入</a>
+      <a href="#/" data-route="/">卡片流</a>
+    </nav>
+
+    <div class="topbar-actions">
+      <button id="reduceToggle" class="ghost-btn" type="button" aria-pressed="false" title="减弱动效">
+        <span class="dot" aria-hidden="true"></span> 减弱动效
+      </button>
+    </div>
+  </header>
+
+  <main id="view" class="view" tabindex="-1"><!-- 视图由路由渲染 --></main>
+
+  <footer class="foot">
+    <span>DeepTalk · 纯本地运行,数据不出设备</span>
+    <span class="foot-hint">前端原型 · 字段与 docs/contracts 一一对应</span>
+  </footer>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "deeptalk",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "serve": "node scripts/serve.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "dev:vite": "vite"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "pdfkit": "^0.19.1",
+    "pureimage": "^0.4.20"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "vite": "^6"
+  }
+}

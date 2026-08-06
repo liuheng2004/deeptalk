@@ -1,0 +1,16 @@
+# -*- coding: utf-8 -*-
+"""?? txt ?????
+
+?????????????????? txt ?????
+docs/contracts/session.schema.json ? ChatSession ???
+
+????:docs/guides/parser-spec.md?
+"""
+from __future__ import absolute_import
+
+import re
+import hashlib
+
+from .wechat import Message, ChatSession, parse_wechat_file, parse_wechat_text
+
+__all__ = ["Message", "ChatSession", "parse_wechat_file", "parse_wechat_text"]
